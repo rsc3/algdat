@@ -123,15 +123,16 @@ dataH = [];
 for i = 1:1000
     img = reshape(train(i,2:end),[28,28])';
     imgDCT = dct2(img);
-    imgD = imgDCT.*diagMask;
-    imgV = imgDCT.*vertMask;
-    imgH = imgDCT.*horizMask;
-    
-    dataD = [dataD imgD(indxD)];
-    dataV = [dataV imgV(indxV)];
-    dataH = [dataH imgH(indxH)];
-    
-    
+%     imgD = imgDCT.*diagMask;
+%     imgV = imgDCT.*vertMask;
+%     imgH = imgDCT.*horizMask;
+%     
+%     dataD = [dataD imgD(indxD)'];
+%     dataV = [dataV imgV(indxV)'];
+%     dataH = [dataH imgH(indxH)'];
+    dataD = [dataD; imgDCT(indxD)'];
+    dataV = [dataV; imgDCT(indxV)'];
+    dataH = [dataH; imgDCT(indxH)'];
 end
 
 indx0 = find(classLabels(1:1000) == 0);
@@ -147,19 +148,19 @@ indx9 = find(classLabels(1:1000) == 9);
 
 % The following uses the correlation matrix to determine how many
 % principal components to keep
-rD = corrcoef(dataD');
+rD = corrcoef(dataD);
 [R_eigVec, R_eigVal, R_explained] = pcacov(rD);
 R_eigVal_diag = diag(R_eigVal);
 R_CumulativeSum = cumsum(R_explained);
 indxD = find(R_eigVal >= 4); % indx = 1:15;
 
-rV = corrcoef(dataV');
+rV = corrcoef(dataV);
 [R_eigVec, R_eigVal, R_explained] = pcacov(rV);
 R_eigVal_diag = diag(R_eigVal);
 R_CumulativeSum = cumsum(R_explained);
 indxV = find(R_eigVal >= 4); % indx = 1:10;
 
-rV = corrcoef(dataV');
+rV = corrcoef(dataV);
 [R_eigVec, R_eigVal, R_explained] = pcacov(rV);
 R_eigVal_diag = diag(R_eigVal);
 R_CumulativeSum = cumsum(R_explained);
@@ -170,17 +171,17 @@ indxH = find(R_eigVal >= 4); % indx = 1:10;
 % correlation matrix allows the new data to have the same variance of
 % the calculated eigen values. Also, when calculatig the covariance the
 % data is zero meaned. 
-CD = cov(dataD');
+CD = cov(dataD);
 [C_eigVecD, C_eigVal, C_explained] = pcacov(CD);
-CV = cov(dataV');
+CV = cov(dataV);
 [C_eigVecV, C_eigVal, C_explained] = pcacov(CV);
-CH = cov(dataH');
+CH = cov(dataH);
 [C_eigVecH, C_eigVal, C_explained] = pcacov(CH);
 % Now we use the top principal components from above. 
 pcaFeatures = [];
-pcaFeatures = [pcaFeatures dataD'*C_eigVecD(:,indxD)]; 
-pcaFeatures = [pcaFeatures dataV'*C_eigVecV(:,indxV)];
-pcaFeatures = [pcaFeatures dataH'*C_eigVecH(:,indxH)];
+pcaFeatures = [pcaFeatures dataD*C_eigVecD(:,indxD)]; 
+pcaFeatures = [pcaFeatures dataV*C_eigVecV(:,indxV)];
+pcaFeatures = [pcaFeatures dataH*C_eigVecH(:,indxH)];
 figure,plot(pcaFeatures(indx0,3), pcaFeatures(indx0,16),'or',...
         pcaFeatures(indx1,3), pcaFeatures(indx1,16),'+g',...
         pcaFeatures(indx2,3), pcaFeatures(indx2,16),'*b',...
